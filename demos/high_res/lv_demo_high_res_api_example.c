@@ -87,7 +87,7 @@ static void exit_cb(lv_demo_high_res_api_t * api)
     lv_obj_delete(api->base_obj);
     lv_obj_set_style_bg_color(lv_screen_active(), lv_color_black(), 0);
     lv_refr_now(NULL);
-    system("cat /dev/zero > /dev/fb1 2>/dev/null");
+    system("cat /dev/zero > /dev/fb0 2>/dev/null");
     exit(0);
 }
 
