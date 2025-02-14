@@ -24,17 +24,16 @@ extern int playing_now;
 
 void *audio_play() {
         unsigned int pcm, tmp, dir;
-        int rate, channels;
-        float seconds;
+        int rate, channels, seconds;
         snd_pcm_t *pcm_handle;
         snd_pcm_hw_params_t *params;
         snd_pcm_uframes_t frames;
         char *buff;
         int buff_size, loops;
 
-        rate     = 44100;
-        channels = 2;
-        seconds  = 30;
+        rate     = 22050;
+        channels = 1;
+        seconds  = 26;
 
         /* Open the PCM device in playback mode */
         if (pcm = snd_pcm_open(&pcm_handle, PCM_DEVICE, SND_PCM_STREAM_PLAYBACK, 0) < 0){ 
@@ -90,7 +89,7 @@ void *audio_play() {
         snd_pcm_hw_params_get_rate(params, &tmp, 0);
         printf("rate: %d bps\n", tmp);
 
-        printf("seconds: %f\n", seconds);
+        printf("seconds: %d\n", seconds);
 
         /* Allocate buffer to hold single period */
         snd_pcm_hw_params_get_period_size(params, &frames, 0);
@@ -100,13 +99,25 @@ void *audio_play() {
 
         snd_pcm_hw_params_get_period_time(params, &tmp, NULL);
 
+        char *filename_wav = "/usr/share/examples/svg/embedded/desktopservices/data/sax.wav";
+        char *filename_mp3 = "/usr/share/examples/svg/embedded/desktopservices/data/sax.mp3";
+        if (access(filename_mp3, F_OK) == 0){           //mp3 audio file exists
+                if(access(filename_wav, F_OK) != 0){    //wav audio file does not exist, create it
+                        char command[50];
+                        sprintf(command, "ffmpeg -i %s %s", filename_mp3, filename_wav);
+                        int error = system(command);
+                }
+        }
+        else                                            //return if mp3 audio file does not exist
+                return;
+
         while(1){
-            int fd = open("/usr/share/examples/svg/embedded/desktopservices/data/sax.mp3", O_RDONLY);
+            int fd = open(filename_wav, O_RDONLY);
             if (fd == -1) {
                 perror("Error opening audio file"); 
                 return;
             }      
-            for (loops = (seconds * 10000) / tmp; loops > 0; loops--) {
+            for (loops = (seconds * 1000000) / tmp; loops > 0; loops--) {
                     while(1){
                         pthread_mutex_lock(&playing_now_lock);
                         if(playing_now){
