@@ -31,9 +31,9 @@ void *audio_play() {
         char *buff;
         int buff_size, loops;
 
-        rate     = 22050;
+        rate     = 48000;
         channels = 1;
-        seconds  = 26;
+        seconds  = 1;
 
         /* Open the PCM device in playback mode */
         if (pcm = snd_pcm_open(&pcm_handle, PCM_DEVICE, SND_PCM_STREAM_PLAYBACK, 0) < 0){ 
@@ -99,18 +99,7 @@ void *audio_play() {
 
         snd_pcm_hw_params_get_period_time(params, &tmp, NULL);
 
-        char *filename_wav = "/usr/share/examples/svg/embedded/desktopservices/data/sax.wav";
-        char *filename_mp3 = "/usr/share/examples/svg/embedded/desktopservices/data/sax.mp3";
-        if (access(filename_mp3, F_OK) == 0){           //mp3 audio file exists
-                if(access(filename_wav, F_OK) != 0){    //wav audio file does not exist, create it
-                        char command[50];
-                        sprintf(command, "ffmpeg -i %s %s", filename_mp3, filename_wav);
-                        int error = system(command);
-                }
-        }
-        else                                            //return if mp3 audio file does not exist
-                return;
-
+        char *filename_wav = "/usr/share/sounds/alsa/Noise.wav";
         while(1){
             int fd = open(filename_wav, O_RDONLY);
             if (fd == -1) {
