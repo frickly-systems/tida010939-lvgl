@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <unistd.h>
 
 extern int delay_millis;
 extern pthread_mutex_t delay_lock;
 
-void *led_blink() {
+void *led_blink(void *arg) {
     char on = '1';
     char off = '0';
     int fd = open("/sys/devices/platform/leds/leds/am62-sk\:green\:heartbeat/brightness", O_WRONLY);
     if (fd == -1) {
         perror("Error opening LED sysfs"); 
-        return;
+        return NULL;
     }
     write (fd, &off, 1);
     int delay_local;
@@ -25,4 +26,5 @@ void *led_blink() {
         usleep(delay_local*1000);
     }  
     close(fd);
+    return NULL;
 }

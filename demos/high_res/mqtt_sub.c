@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "lv_demo_high_res_private.h"
+#include "../../src/osal/lv_os.h"
 
 static lv_demo_high_res_api_t * api_hmi;
 
@@ -106,10 +107,10 @@ void on_message_vol_sub(struct mosquitto *mosq, void *obj, const struct mosquitt
 }
 
 
-void *mqtt_sub_init(lv_demo_high_res_api_t * api){
+void *mqtt_sub_init(void * api){
   struct mosquitto *mosq;
   int rc;
-  api_hmi = api;
+  api_hmi = (lv_demo_high_res_api_t*)api;
 
   /* Required before calling other mosquitto functions */
   mosquitto_lib_init();
@@ -122,7 +123,7 @@ void *mqtt_sub_init(lv_demo_high_res_api_t * api){
   mosq = mosquitto_new(NULL, true, NULL);
   if(mosq == NULL){
         fprintf(stderr, "Error: Out of memory.\n");
-        return;
+        return NULL;
   }
 
   /* Configure callbacks. This should be done before connecting ideally. */
@@ -141,7 +142,7 @@ void *mqtt_sub_init(lv_demo_high_res_api_t * api){
   if(rc != MOSQ_ERR_SUCCESS){
         mosquitto_destroy(mosq);
         fprintf(stderr, "Error: %s\n", mosquitto_strerror(rc));
-        return;
+        return NULL;
   }
 
   /* Run the network loop in a blocking call. The only thing we do in this
@@ -153,5 +154,5 @@ void *mqtt_sub_init(lv_demo_high_res_api_t * api){
   mosquitto_loop_forever(mosq, -1, 1);
 
   mosquitto_lib_cleanup();
-  return;
+  return NULL;
 }

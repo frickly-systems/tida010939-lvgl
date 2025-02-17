@@ -38,7 +38,7 @@ void *audio_play() {
         /* Open the PCM device in playback mode */
         if (pcm = snd_pcm_open(&pcm_handle, PCM_DEVICE, SND_PCM_STREAM_PLAYBACK, 0) < 0){ 
                 printf("ERROR: Can't open \"%s\" PCM device. %s\n", PCM_DEVICE, snd_strerror(pcm));
-                return;
+                return NULL;
         }
 
         /* Allocate parameters object and fill it with default values*/
@@ -49,28 +49,28 @@ void *audio_play() {
         /* Set parameters */
         if (pcm = snd_pcm_hw_params_set_access(pcm_handle, params, SND_PCM_ACCESS_RW_INTERLEAVED) < 0){ 
                 printf("ERROR: Can't set interleaved mode. %s\n", snd_strerror(pcm));
-                return;
+                return NULL;
         }
 
         if (pcm = snd_pcm_hw_params_set_format(pcm_handle, params, SND_PCM_FORMAT_S16_LE) < 0){
                 printf("ERROR: Can't set format. %s\n", snd_strerror(pcm));
-                return;
+                return NULL;
         }
 
         if (pcm = snd_pcm_hw_params_set_channels(pcm_handle, params, channels) < 0){ 
                 printf("ERROR: Can't set channels number. %s\n", snd_strerror(pcm));
-                return;
+                return NULL;
         }
 
         if (pcm = snd_pcm_hw_params_set_rate_near(pcm_handle, params, &rate, 0) < 0){ 
                 printf("ERROR: Can't set rate. %s\n", snd_strerror(pcm));
-                return;
+                return NULL;
         }
 
         /* Write parameters */
         if (pcm = snd_pcm_hw_params(pcm_handle, params) < 0){
                 printf("ERROR: Can't set harware parameters. %s\n", snd_strerror(pcm));
-                return;
+                return NULL;
         }
 
         /* Resume information */
@@ -104,7 +104,7 @@ void *audio_play() {
             int fd = open(filename_wav, O_RDONLY);
             if (fd == -1) {
                 perror("Error opening audio file"); 
-                return;
+                return NULL;
             }      
             for (loops = (seconds * 1000000) / tmp; loops > 0; loops--) {
                     while(1){
@@ -122,7 +122,7 @@ void *audio_play() {
 
                     if (pcm = read(fd, buff, buff_size) == 0) {
                             printf("Early end of file.\n");
-                            return 0;
+                            return NULL;
                     }
 
                     if (pcm = snd_pcm_writei(pcm_handle, buff, frames) == -EPIPE) {

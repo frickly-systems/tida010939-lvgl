@@ -30,6 +30,7 @@
 #include <pthread.h>
 #include "iio_utils.h"
 #include "lv_demo_high_res_private.h"
+#include "../../src/osal/lv_os.h"
 
 static lv_demo_high_res_api_t * api_hmi;
 static struct mosquitto *mosq;
@@ -191,7 +192,7 @@ int *adc_init(lv_demo_high_res_api_t * api)
 
 		if (fp == NULL) {
 			perror("popen failed");
-			return 1;
+			return NULL;
 		}
 
 	
@@ -207,5 +208,5 @@ int *adc_init(lv_demo_high_res_api_t * api)
 	}
     mosquitto_lib_cleanup();
 
-	return 1;
+	return NULL;
 }

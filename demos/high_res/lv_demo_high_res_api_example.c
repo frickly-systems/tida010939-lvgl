@@ -10,7 +10,9 @@
 #include <stdlib.h>
 #include "../../src/core/lv_refr.h"
 #include "lv_demo_high_res.h"
-#include<strings.h>
+#include "../../src/osal/lv_os.h"
+#include <string.h>
+#include <stdio.h>
 #include<pthread.h>
 #if LV_USE_DEMO_HIGH_RES
 
@@ -55,12 +57,12 @@ extern int button_configured;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-extern void *audio_play(void);
-extern void *mqtt_sub_init(void);
-extern void *clock_init(void);
-extern void *button_init(void);
-extern void *led_blink(void);
-extern void *adc_init(void);
+extern void *audio_play(void *);
+extern void *mqtt_sub_init(void *);
+extern void *clock_init(void * );
+extern void *button_init(void *);
+extern void *led_blink(void *);
+extern void *adc_init(void *);
 
 
 void lv_demo_high_res_api_example(const char * assets_path, const char * logo_path, const char * slides_path)
@@ -109,17 +111,17 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
 
     if (pthread_mutex_init(&delay_lock, NULL) != 0) { 
         printf("\n mutex init has failed\n"); 
-        return 1; 
+        return;
     }
     if (pthread_mutex_init(&playing_now_lock, NULL) != 0) { 
         printf("\n mutex init has failed\n"); 
-        return 1; 
+        return; 
     }
     pthread_create(&audio_thread, NULL, audio_play, NULL);
-    pthread_create(&mqtt_sub_thread, NULL, mqtt_sub_init, api);
-    pthread_create(&clock_thread, NULL, clock_init, api);
+    pthread_create(&mqtt_sub_thread, NULL, mqtt_sub_init, (void*)api);
+    pthread_create(&clock_thread, NULL, clock_init, (void*)api);
     pthread_create(&led_thread, NULL, led_blink, NULL);
-    pthread_create(&button_thread, NULL, button_init, api);
+    pthread_create(&button_thread, NULL, button_init, (void*)api);
     pthread_create(&adc_thread, NULL, adc_init, api);
     
 }

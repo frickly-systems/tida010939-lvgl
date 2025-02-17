@@ -3,14 +3,18 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <string.h>
+#include <unistd.h>
 #include "lv_demo_high_res_private.h"
+#include "../../src/osal/lv_os.h"
 
 
 static void slice(const char* str, char* result, size_t start, size_t end) {
     strncpy(result, str + start, end - start);
 }
 
-void *clock_init(lv_demo_high_res_api_t * api) {
+void *clock_init(void * api_arg) {
+    lv_demo_high_res_api_t *api = (lv_demo_high_res_api_t*)api_arg;
+
     int last_minute = -1;
     while(1){
         char buffer[128];
@@ -18,7 +22,7 @@ void *clock_init(lv_demo_high_res_api_t * api) {
 
         if (fp == NULL) {
             perror("popen failed");
-            return 1;
+            return NULL;
         }
 
         if (fgets(buffer, sizeof(buffer), fp) == NULL) {
@@ -130,4 +134,5 @@ void *clock_init(lv_demo_high_res_api_t * api) {
         last_minute = minute;
         usleep(1000000);
     }
+    return NULL;
 }

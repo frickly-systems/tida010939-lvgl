@@ -13,6 +13,7 @@
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include "lv_demo_high_res_private.h"
+#include "../../src/osal/lv_os.h"
 
 int button_configured = 0;
 
@@ -40,8 +41,9 @@ const char *ev_code_syn[SYN_CNT] = {
 	[SYN_MAX]       = "SYN_MAX",
 };
 
-void *button_init(lv_demo_high_res_api_t * api)
+void *button_init(void * api_arg)
 {
+    lv_demo_high_res_api_t *api = (lv_demo_high_res_api_t*)api_arg;
         int fd;
         char dev[] = "/dev/input/eventX";
         struct input_event ie;
@@ -51,7 +53,7 @@ void *button_init(lv_demo_high_res_api_t * api)
 
         if (fp == NULL) {
             perror("popen failed");
-            return 1;
+            return NULL;
         }
 
         if (fgets(buffer, sizeof(buffer), fp) != NULL) {
@@ -62,7 +64,7 @@ void *button_init(lv_demo_high_res_api_t * api)
         }
         else{
             printf("Button not Configured\n");
-            return 0;
+            return NULL;
         }
 
         if ((fd = open(dev, O_RDONLY)) == -1) {
@@ -88,5 +90,5 @@ void *button_init(lv_demo_high_res_api_t * api)
 
         close(fd);
 
-        return EXIT_SUCCESS;
+        return NULL;
 }
