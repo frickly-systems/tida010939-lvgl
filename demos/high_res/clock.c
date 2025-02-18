@@ -10,6 +10,7 @@
 
 static void slice(const char* str, char* result, size_t start, size_t end) {
     strncpy(result, str + start, end - start);
+    result[end - start] = '\0';
 }
 
 void *clock_init(void * api_arg) {
