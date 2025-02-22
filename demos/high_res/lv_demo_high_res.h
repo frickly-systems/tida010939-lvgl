@@ -87,7 +87,7 @@ typedef struct {
     void * user_data; /* optional extra data field for the user to use freely */
 } lv_demo_high_res_api_t;
 
-typedef void (*lv_demo_high_res_exit_cb_t)(lv_demo_high_res_api_t * api);
+typedef void (*lv_demo_high_res_exit_cb_t)(int);
 
 /**********************
  * GLOBAL PROTOTYPES
