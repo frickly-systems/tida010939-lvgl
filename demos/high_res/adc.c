@@ -184,6 +184,11 @@ int mqtt_temp_pub_init(){
 
 int *adc_init(lv_demo_high_res_api_t * api)
 {
+	if (access("/sys/bus/iio/devices/iio\:device0/in_voltage0_raw", F_OK)) {
+		printf("ADC does not exist\n");
+		pthread_exit(0);
+	}
+
 	api_hmi = api;
     mqtt_temp_pub_init();
 	char line[16];
