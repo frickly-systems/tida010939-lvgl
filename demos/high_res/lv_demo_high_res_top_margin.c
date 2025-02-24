@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include <signal.h>
 #include "lv_demo_high_res_private.h"
 #if LV_USE_DEMO_HIGH_RES
 
@@ -146,7 +147,7 @@ void lv_demo_high_res_top_margin_deinit_subjects(lv_demo_high_res_ctx_t * c)
 static void logout_cb(lv_event_t * e)
 {
     lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
-    if(c->exit_cb) c->exit_cb(&c->api);
+    if(c->exit_cb) c->exit_cb(SIGTERM);
 }
 
 static lv_obj_t * create_icon(lv_obj_t * parent, lv_subject_t * subject, lv_image_dsc_t ** img_dsc_pair,

@@ -8,6 +8,7 @@
  *********************/
 
 #include <stdlib.h>
+#include <signal.h>
 #include "../../src/core/lv_refr.h"
 #include "lv_demo_high_res.h"
 #include "../../src/osal/lv_os.h"
@@ -34,12 +35,14 @@ static pthread_t clock_thread;
 static pthread_t button_thread;
 static pthread_t led_thread;
 static pthread_t adc_thread;
-static void exit_cb(lv_demo_high_res_api_t * api);
+static void exit_cb(int sig);
 static void output_subject_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static lv_demo_high_res_api_t * api = NULL;
 
 /**********************
  *      MACROS
@@ -67,7 +70,18 @@ extern void *adc_init(void *);
 
 void lv_demo_high_res_api_example(const char * assets_path, const char * logo_path, const char * slides_path)
 {
-    lv_demo_high_res_api_t * api = lv_demo_high_res(assets_path, logo_path, slides_path, exit_cb);
+	if (!api)
+		api = lv_demo_high_res(assets_path, logo_path, slides_path, exit_cb);
+	else
+		return;
+
+	/* handle SIGINT (for eg, sent by Crtl-C and `kill`) and SIGTERM (for eg, sent by `systemctl stop`) */
+	struct sigaction sa;
+	sa.sa_handler = exit_cb;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
 
     /* see lv_demo_high_res.h for documentation of the available subjects */
     lv_subject_set_int(&api->subjects.volume, 50);
@@ -130,9 +144,10 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
  *   STATIC FUNCTIONS
  **********************/
 
-static void exit_cb(lv_demo_high_res_api_t * api)
+static void exit_cb(int sig)
 {
-    lv_obj_delete(api->base_obj);
+	if (api)
+		lv_obj_delete(api->base_obj);
     lv_obj_set_style_bg_color(lv_screen_active(), lv_color_black(), 0);
     lv_refr_now(NULL);
     system("cat /dev/zero > /dev/fb0 2>/dev/null");
